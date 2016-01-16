@@ -155,7 +155,6 @@ public class WeChatPayUtil {
 	
 	/**
 	 * 生成回调确认信息xml
-	 * @author jiwenxing
 	 * @param return_code
 	 * @param return_msg
 	 * @return String
@@ -168,7 +167,6 @@ public class WeChatPayUtil {
 	
 	/**
 	 * 日期格式转换方法
-	 * @author jiwenxing
 	 * @param strDate
 	 * @return Date
 	 */

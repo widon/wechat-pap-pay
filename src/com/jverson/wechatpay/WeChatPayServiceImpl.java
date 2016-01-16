@@ -97,7 +97,7 @@ public class WeChatPayServiceImpl implements WeChatPayService{
 		params.put("notify_url", WeChatConstants.SIGN_NOTIFY_URL); 
 		params.put("version", WeChatConstants.VERSION); 
 		params.put("timestamp", new Date().getTime()/1000); //时间戳限制10位
-		params.put("return_app", 1); //时间戳限制10位
+		params.put("return_app", 1); 
 		String sign = WeChatPayUtil.getSignature(params);
 		/**
 		 * notify_url、contract_display_account(含有汉子) 需要在生成签名后encode
@@ -146,7 +146,7 @@ public class WeChatPayServiceImpl implements WeChatPayService{
 				params.put("version", WeChatConstants.VERSION); //数据库无则用默认值1.0
 			}
 		}else{
-			return false; //数据库没有记录则该用户第一次使用来点免密支付
+			return false; //数据库没有记录则该用户第一次签约
 		}
 		
 		Map<Object, Object> resultMap = WeChatPayUtil.HttpPostMethod(params, WeChatConstants.CHECK_SIGN_STATUS_HTTP, WeChatConstants.SOCKET_TIMEOUT, WeChatConstants.CONNECT_TIMEOUT);
@@ -218,13 +218,13 @@ public class WeChatPayServiceImpl implements WeChatPayService{
 			if(null != weChatPaySign.getVersion()){
 				params.put("version", weChatPaySign.getVersion()); 
 			}else{
-				params.put("version", WeChatConstants.VERSION); //数据库无则用默认值1.0
+				params.put("version", WeChatConstants.VERSION); 
 			}
 		}else{
 			logger.error("该用户没有签约记录！");
 			return false; 
 		}
-		params.put("contract_termination_remark", "terminate from laidian"); //解约备注（待定）
+		params.put("contract_termination_remark", "terminated"); 
         Map<Object, Object> resultMap = WeChatPayUtil.HttpPostMethod(params, WeChatConstants.TERMINATE_SIGN_HTTP, WeChatConstants.SOCKET_TIMEOUT, WeChatConstants.CONNECT_TIMEOUT);
 		if("SUCCESS".equals(resultMap.get("valid"))){
 			WeChatPaySign updateSignState = new WeChatPaySign();
@@ -346,7 +346,6 @@ public class WeChatPayServiceImpl implements WeChatPayService{
 							weChatPaySign.setStatus(WeChatConstants.SIGN_STATUS_NO);
 							Integer cnt = weChatPaySignDao.updateByContractCode(weChatPaySign); //根据contract_code更新本地签约记录
 							
-							// 删除成功，所有的使用微信免密支付的来点都修改为货到付款
 							WeChatPaySign sign = weChatPaySignDao.findByContractCode((String)notifyMap.get("contract_code"));
 							QuickBind quickBind = new QuickBind();
 							quickBind.setUserPin(sign.getUserPin());
